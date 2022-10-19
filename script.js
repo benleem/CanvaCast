@@ -21,32 +21,9 @@ canvas.addEventListener("click", (event) => {
 	let rect = canvas.getBoundingClientRect();
 	let mouseX = event.clientX - rect.left;
 	let mouseY = event.clientY - rect.top;
-	console.log("Coordinate x: " + mouseX, "Coordinate y: " + mouseY);
 	drawMap(mouseX, mouseY);
 });
 
-const drawGrid = (x, y) => {
-	ctx.moveTo(x, 0);
-	ctx.lineTo(x, canvasHeight);
-	ctx.stroke();
-	ctx.moveTo(0, y);
-	ctx.lineTo(canvasWidth, y);
-	ctx.stroke();
-};
-
-const drawRectangle = (x, y, stepX, stepY) => {
-	if (map[(y / stepY) * mapX + x / stepX] === 1) {
-		ctx.beginPath();
-		ctx.rect(x, y, stepX, stepY);
-		ctx.fillStyle = "white";
-		ctx.fill();
-	} else {
-		ctx.beginPath();
-		ctx.rect(x, y, stepX, stepY);
-		ctx.fillStyle = "black";
-		ctx.fill();
-	}
-};
 const drawMap = (mouseX, mouseY) => {
 	let stepX = canvasWidth / mapX;
 	let stepY = canvasHeight / mapY;
@@ -71,6 +48,29 @@ const drawMap = (mouseX, mouseY) => {
 			drawGrid(x, y);
 		}
 	}
+};
+
+const drawRectangle = (x, y, stepX, stepY) => {
+	if (map[(y / stepY) * mapX + x / stepX] === 1) {
+		ctx.beginPath();
+		ctx.rect(x, y, stepX, stepY);
+		ctx.fillStyle = "white";
+		ctx.fill();
+	} else {
+		ctx.beginPath();
+		ctx.rect(x, y, stepX, stepY);
+		ctx.fillStyle = "black";
+		ctx.fill();
+	}
+};
+
+const drawGrid = (x, y) => {
+	ctx.moveTo(x, 0);
+	ctx.lineTo(x, canvasHeight);
+	ctx.stroke();
+	ctx.moveTo(0, y);
+	ctx.lineTo(canvasWidth, y);
+	ctx.stroke();
 };
 
 drawMap();
