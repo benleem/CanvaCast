@@ -16,11 +16,12 @@ body {
 }
 
 canvas {
-	max-width: 800px;
-	width: 100%;
-	background-color: aqua;
+	width: 800px;
+	height: 600px;
+	background-color: grey;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
+	border: 2px solid black;
 }
 
 .canvas-container {

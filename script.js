@@ -1,10 +1,41 @@
+// Canvas
 const canvas = document.querySelector("canvas");
-const context = canvas.getContext("2d");
+const ctx = canvas.getContext("2d");
+const canvasHeight = 600;
+const canvasWidth = 800;
+ctx.canvas.width = canvasWidth;
+ctx.canvas.height = canvasHeight;
 
-canvas.height = canvas.width * (3 / 4);
+//Engine
+const map = [
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+];
+const mapX = map[0].length;
+const mapY = map.length;
+const mapSize = mapX * mapY;
+console.log(`The map size is ${mapSize} units`);
 
-window.onresize(() => {
-	// context.canvas.height = window.innerHeight;
-	// context.canvas.width = window.innerWidth;
-	// context.canvas.height = (3 * window.innerWidth) / 4;
-});
+const drawMap = () => {
+	let x, y;
+	for (y = 0; y <= canvasHeight; y += canvasHeight / mapY) {
+		for (x = 0; x <= canvasWidth; x += canvasWidth / mapX) {
+			ctx.moveTo(x, 0);
+			ctx.lineTo(x, canvasHeight);
+			ctx.stroke();
+			ctx.moveTo(0, y);
+			ctx.lineTo(canvasWidth, y);
+			ctx.stroke();
+		}
+	}
+};
+
+drawMap();
