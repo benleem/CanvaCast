@@ -8,6 +8,7 @@ ctx.canvas.height = canvasHeight;
 
 //Engine
 const tick = 30;
+const fov = 60;
 const map = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -23,6 +24,8 @@ const map = [
 const mapX = map[0].length;
 const mapY = map.length;
 const mapSize = mapX * mapY;
+const cellX = canvasWidth / mapX;
+const cellY = canvasHeight / mapY;
 
 const player = {
 	size: 20,
@@ -42,43 +45,40 @@ const playerController = () => {
 	player.posY += Math.sin(player.angle) * player.speed;
 };
 
-const drawMap = (mouseX, mouseY, rays) => {
-	let stepX = canvasWidth / mapX;
-	let stepY = canvasHeight / mapY;
-	let x, y;
-	for (y = 0; y < canvasHeight; y += stepY) {
-		for (x = 0; x < canvasWidth; x += stepX) {
+const drawMap = (mouseX, mouseY) => {
+	for (let y = 0; y < canvasHeight; y += cellY) {
+		for (let x = 0; x < canvasWidth; x += cellX) {
 			if (
 				mouseX &&
 				mouseY &&
 				mouseX >= x &&
 				mouseY >= y &&
-				mouseX <= x + stepX &&
-				mouseY <= y + stepY
+				mouseX <= x + cellX &&
+				mouseY <= y + cellY
 			) {
-				if (map[y / stepY][x / stepX] === 1) {
-					map[y / stepY][x / stepX] = 0;
+				if (map[y / cellY][x / cellX] === 1) {
+					map[y / cellY][x / cellX] = 0;
 				} else {
-					map[y / stepY][x / stepX] = 1;
+					map[y / cellY][x / cellX] = 1;
 				}
 			}
-			drawRectangle(x, y, stepX, stepY);
+			drawRectangle(x, y, cellX, cellY);
 			drawGrid(x, y);
 		}
 	}
 	drawPlayer();
 };
 
-const drawRectangle = (x, y, stepX, stepY) => {
-	if (map[y / stepY][x / stepX] === 1) {
+const drawRectangle = (x, y, cellX, cellY) => {
+	if (map[y / cellY][x / cellX] === 1) {
 		ctx.beginPath();
-		ctx.rect(x, y, stepX, stepY);
+		ctx.rect(x, y, cellX, cellY);
 		ctx.fillStyle = "white";
 		ctx.fill();
 		ctx.closePath();
 	} else {
 		ctx.beginPath();
-		ctx.rect(x, y, stepX, stepY);
+		ctx.rect(x, y, cellX, cellY);
 		ctx.fillStyle = "grey";
 		ctx.fill();
 		ctx.closePath();
@@ -105,8 +105,8 @@ const drawPlayer = () => {
 		player.size
 	);
 
-	// test ray
-	let rayLength = player.size * 2;
+	// player direction ray
+	const rayLength = player.size * 0.5;
 	ctx.strokeStyle = "green";
 	ctx.beginPath();
 	ctx.moveTo(player.posX, player.posY);
@@ -149,8 +149,8 @@ document.addEventListener("mousemove", (event) => {
 });
 
 canvas.addEventListener("click", (event) => {
-	let rect = canvas.getBoundingClientRect();
-	let mouseX = event.clientX - rect.left;
-	let mouseY = event.clientY - rect.top;
+	const rect = canvas.getBoundingClientRect();
+	const mouseX = event.clientX - rect.left;
+	const mouseY = event.clientY - rect.top;
 	drawMap(mouseX, mouseY);
 });
