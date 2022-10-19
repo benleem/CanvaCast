@@ -18,7 +18,7 @@ body {
 canvas {
 	width: 800px;
 	height: 600px;
-	/* background-color: grey; */
+	position: relative;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
 	border: 1px solid black;
@@ -30,4 +30,10 @@ canvas {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.array-list {
+	/* max-width: 400px; */
 }
