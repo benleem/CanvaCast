@@ -24,11 +24,6 @@ const mapX = map[0].length;
 const mapY = map.length;
 const mapSize = mapX * mapY;
 
-const clearScreen = () => {
-	ctx.fillStyle = "white";
-	ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-};
-
 const player = {
 	size: 20,
 	posX: canvasWidth * 0.5,
@@ -37,28 +32,17 @@ const player = {
 	speed: 0,
 };
 
-// document.addEventListener("keydown", (event) => {
-// 	if (event.key === "w") {
-// 		player.posY -= 5;
-// 	} else if (event.key === "a") {
-// 		player.posX -= 5;
-// 	} else if (event.key === "s") {
-// 		player.posY += 5;
-// 	} else if (event.key === "d") {
-// 		player.posX += 5;
-// 	}
-// 	console.log(player);
-// 	requestAnimationFrame(drawPlayer);
-// });
+const clearScreen = () => {
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+};
 
-canvas.addEventListener("click", (event) => {
-	let rect = canvas.getBoundingClientRect();
-	let mouseX = event.clientX - rect.left;
-	let mouseY = event.clientY - rect.top;
-	drawMap(mouseX, mouseY);
-});
+const playerController = () => {
+	player.posX += Math.cos(player.angle) * player.speed;
+	player.posY += Math.sin(player.angle) * player.speed;
+};
 
-const drawMap = (mouseX, mouseY) => {
+const drawMap = (mouseX, mouseY, rays) => {
 	let stepX = canvasWidth / mapX;
 	let stepY = canvasHeight / mapY;
 	let x, y;
@@ -136,7 +120,37 @@ const drawPlayer = () => {
 
 const gameLoop = () => {
 	clearScreen();
+	playerController();
 	drawMap();
 };
 
 setInterval(gameLoop, tick);
+
+const convertToRad = (deg) => {
+	return (deg * Math.PI) / 180;
+};
+
+document.addEventListener("keydown", (event) => {
+	if (event.key === "w") {
+		player.speed = 2;
+	} else if (event.key === "s") {
+		player.speed = -2;
+	}
+});
+
+document.addEventListener("keyup", (event) => {
+	if (event.key === "w" || event.key === "s") {
+		player.speed = 0;
+	}
+});
+
+document.addEventListener("mousemove", (event) => {
+	player.angle += convertToRad(event.movementX);
+});
+
+canvas.addEventListener("click", (event) => {
+	let rect = canvas.getBoundingClientRect();
+	let mouseX = event.clientX - rect.left;
+	let mouseY = event.clientY - rect.top;
+	drawMap(mouseX, mouseY);
+});
