@@ -8,26 +8,32 @@ ctx.canvas.height = canvasHeight;
 
 //Engine
 const map = [
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
+	0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+	0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+	0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 ];
-const mapX = map[0].length;
-const mapY = map.length;
+const mapX = 10;
+const mapY = 10;
 const mapSize = mapX * mapY;
-console.log(`The map size is ${mapSize} units`);
 
 const drawMap = () => {
+	let stepX = canvasWidth / mapX;
+	let stepY = canvasHeight / mapY;
 	let x, y;
-	for (y = 0; y <= canvasHeight; y += canvasHeight / mapY) {
-		for (x = 0; x <= canvasWidth; x += canvasWidth / mapX) {
+	for (y = 0; y <= canvasHeight; y += stepY) {
+		for (x = 0; x <= canvasWidth; x += stepX) {
+			if (map[(y / stepY) * mapX + x / stepX] === 1) {
+				ctx.beginPath();
+				ctx.rect(x, y, stepX, stepY);
+				ctx.fillStyle = "white";
+				ctx.fill();
+			} else {
+				ctx.beginPath();
+				ctx.rect(x, y, stepX, stepY);
+				ctx.fillStyle = "black";
+				ctx.fill();
+			}
 			ctx.moveTo(x, 0);
 			ctx.lineTo(x, canvasHeight);
 			ctx.stroke();
