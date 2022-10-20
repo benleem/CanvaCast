@@ -48,6 +48,7 @@ const playerController = () => {
 const drawMap = (mouseX, mouseY) => {
 	for (let y = 0; y < canvasHeight; y += cellY) {
 		for (let x = 0; x < canvasWidth; x += cellX) {
+			// tile toggling
 			if (
 				mouseX &&
 				mouseY &&
@@ -62,6 +63,19 @@ const drawMap = (mouseX, mouseY) => {
 					map[y / cellY][x / cellX] = 1;
 				}
 			}
+
+			// collision
+			if (
+				player.posX + player.size / 2 > x &&
+				player.posX - player.size / 2 < x + cellX &&
+				player.posY + player.size / 2 > y &&
+				player.posY - player.size / 2 < y + cellY &&
+				map[y / cellY][x / cellX] === 1
+			) {
+				console.log("Wall");
+			}
+
+			// drawing
 			drawRectangle(x, y, cellX, cellY);
 			drawGrid(x, y);
 		}
@@ -87,7 +101,6 @@ const drawRectangle = (x, y, cellX, cellY) => {
 
 const drawGrid = (x, y) => {
 	ctx.strokeStyle = "black";
-
 	ctx.moveTo(x, 0);
 	ctx.lineTo(x, canvasHeight);
 	ctx.stroke();
