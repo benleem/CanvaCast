@@ -16,8 +16,6 @@ body {
 }
 
 canvas {
-	width: 800px;
-	height: 600px;
 	position: relative;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
@@ -32,8 +30,4 @@ canvas {
 	align-items: center;
 	flex-direction: column;
 	gap: 16px;
-}
-
-.array-list {
-	/* max-width: 400px; */
 }

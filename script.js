@@ -1,38 +1,33 @@
 // Canvas
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
-const canvasHeight = 600;
+const canvasHeight = 800;
 const canvasWidth = 800;
 ctx.canvas.width = canvasWidth;
 ctx.canvas.height = canvasHeight;
 
 //Engine
-const tick = 30;
-const fov = 60;
+const FPS = 60;
+const FOV = 60;
+
 const map = [
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
+	0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+	0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+	0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 ];
-const mapX = map[0].length;
-const mapY = map.length;
-const mapSize = mapX * mapY;
-const cellX = canvasWidth / mapX;
-const cellY = canvasHeight / mapY;
+const mapDepth = 10;
+const mapSize = mapDepth * mapDepth;
+const cellSize = canvasWidth / mapDepth;
 
 const player = {
 	size: 20,
 	posX: canvasWidth * 0.5,
 	posY: canvasHeight * 0.5,
 	angle: 0,
-	speed: 0,
+	moveX: 0,
+	moveY: 0,
+	moveAngle: 0,
 };
 
 const clearScreen = () => {
@@ -41,72 +36,65 @@ const clearScreen = () => {
 };
 
 const playerController = () => {
-	player.posX += Math.cos(player.angle) * player.speed;
-	player.posY += Math.sin(player.angle) * player.speed;
+	const playerAngleX = Math.cos(player.angle);
+	const playerAngleY = Math.sin(player.angle);
+	const mapTargetX =
+		Math.floor(player.posY / cellSize) * mapDepth +
+		Math.floor((player.posX + playerAngleX * player.moveX) / cellSize);
+	const mapTargetY =
+		Math.floor((player.posY + playerAngleY * player.moveY) / cellSize) *
+			mapDepth +
+		Math.floor(player.posX / cellSize);
+
+	if (player.moveX && map[mapTargetX] === 0) {
+		player.posX += playerAngleX * player.moveX;
+	}
+	if (player.moveY && map[mapTargetY] === 0) {
+		player.posY += playerAngleY * player.moveY;
+	}
+	if (player.moveAngle) {
+		player.angle += convertToRad(5) * player.moveAngle;
+	}
 };
 
 const drawMap = (mouseX, mouseY) => {
-	for (let y = 0; y < canvasHeight; y += cellY) {
-		for (let x = 0; x < canvasWidth; x += cellX) {
+	for (let y = 0; y < canvasHeight; y += cellSize) {
+		for (let x = 0; x < canvasWidth; x += cellSize) {
 			// tile toggling
 			if (
 				mouseX &&
 				mouseY &&
 				mouseX >= x &&
 				mouseY >= y &&
-				mouseX <= x + cellX &&
-				mouseY <= y + cellY
+				mouseX <= x + cellSize &&
+				mouseY <= y + cellSize
 			) {
-				if (map[y / cellY][x / cellX] === 1) {
-					map[y / cellY][x / cellX] = 0;
+				if (map[(y / cellSize) * mapDepth + x / cellSize]) {
+					map[(y / cellSize) * mapDepth + x / cellSize] = 0;
 				} else {
-					map[y / cellY][x / cellX] = 1;
+					map[(y / cellSize) * mapDepth + x / cellSize] = 1;
 				}
 			}
-
-			// collision
-			if (
-				player.posX + player.size / 2 > x &&
-				player.posX - player.size / 2 < x + cellX &&
-				player.posY + player.size / 2 > y &&
-				player.posY - player.size / 2 < y + cellY &&
-				map[y / cellY][x / cellX] === 1
-			) {
-				console.log("Wall");
-			}
-
-			// drawing
-			drawRectangle(x, y, cellX, cellY);
-			drawGrid(x, y);
+			drawRectangle(x, y, cellSize, cellSize);
 		}
 	}
 	drawPlayer();
 };
 
-const drawRectangle = (x, y, cellX, cellY) => {
-	if (map[y / cellY][x / cellX] === 1) {
+const drawRectangle = (x, y, cellSize) => {
+	if (map[(y / cellSize) * mapDepth + x / cellSize] === 1) {
 		ctx.beginPath();
-		ctx.rect(x, y, cellX, cellY);
-		ctx.fillStyle = "white";
+		ctx.rect(x, y, cellSize, cellSize);
+		ctx.fillStyle = "black";
 		ctx.fill();
 		ctx.closePath();
 	} else {
 		ctx.beginPath();
-		ctx.rect(x, y, cellX, cellY);
-		ctx.fillStyle = "grey";
+		ctx.rect(x, y, cellSize, cellSize);
+		ctx.fillStyle = "white";
 		ctx.fill();
 		ctx.closePath();
 	}
-};
-
-const drawGrid = (x, y) => {
-	ctx.strokeStyle = "black";
-	ctx.moveTo(x, 0);
-	ctx.lineTo(x, canvasHeight);
-	ctx.stroke();
-	ctx.moveTo(0, y);
-	ctx.lineTo(canvasWidth, y);
-	ctx.stroke();
 };
 
 const drawPlayer = () => {
@@ -119,8 +107,9 @@ const drawPlayer = () => {
 	);
 
 	// player direction ray
-	const rayLength = player.size * 0.5;
+	const rayLength = player.size;
 	ctx.strokeStyle = "green";
+	ctx.lineWidth = 2;
 	ctx.beginPath();
 	ctx.moveTo(player.posX, player.posY);
 	ctx.lineTo(
@@ -131,34 +120,43 @@ const drawPlayer = () => {
 	ctx.stroke();
 };
 
+const convertToRad = (deg) => {
+	return (deg * Math.PI) / 180;
+};
+
 const gameLoop = () => {
 	clearScreen();
 	playerController();
 	drawMap();
 };
 
-setInterval(gameLoop, tick);
-
-const convertToRad = (deg) => {
-	return (deg * Math.PI) / 180;
+window.onload = () => {
+	setInterval(gameLoop, 1000 / FPS);
 };
 
 document.addEventListener("keydown", (event) => {
-	if (event.key === "w") {
-		player.speed = 2;
-	} else if (event.key === "s") {
-		player.speed = -2;
+	if (event.key === "s") {
+		player.moveX = -2;
+		player.moveY = -2;
+	} else if (event.key === "w") {
+		player.moveX = 2;
+		player.moveY = 2;
+	}
+	if (event.key === "a") {
+		player.moveAngle = -1;
+	} else if (event.key === "d") {
+		player.moveAngle = 1;
 	}
 });
 
 document.addEventListener("keyup", (event) => {
-	if (event.key === "w" || event.key === "s") {
-		player.speed = 0;
+	if (event.key === "s" || event.key === "w") {
+		player.moveX = 0;
+		player.moveY = 0;
 	}
-});
-
-document.addEventListener("mousemove", (event) => {
-	player.angle += convertToRad(event.movementX);
+	if (event.key === "a" || event.key === "d") {
+		player.moveAngle = 0;
+	}
 });
 
 canvas.addEventListener("click", (event) => {
